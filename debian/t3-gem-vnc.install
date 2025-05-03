@@ -1,0 +1,16 @@
+app			/usr/share/t3-gem-vnc
+core			/usr/share/t3-gem-vnc
+utils/b64-to-binary.pl		/usr/share/t3-gem-vnc/utils
+utils/convert.js		/usr/share/t3-gem-vnc/utils
+utils/genkeysymdef.js		/usr/share/t3-gem-vnc/utils
+utils/novnc_proxy		/usr/share/t3-gem-vnc/utils
+utils/u2x11			/usr/share/t3-gem-vnc/utils
+utils/validate			/usr/share/t3-gem-vnc/utils
+utils/websockify-0.13.0.tar.gz			/usr/share/t3-gem-vnc/utils
+vendor			/usr/share/t3-gem-vnc
+vnc.html		/usr/share/t3-gem-vnc
+vnc_lite.html		/usr/share/t3-gem-vnc
+defaults.json		/usr/share/t3-gem-vnc
+mandatory.json		/usr/share/t3-gem-vnc
+package.json		/usr/share/t3-gem-vnc
+debian/run.sh		/usr/share/t3-gem-vnc

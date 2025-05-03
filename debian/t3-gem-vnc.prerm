@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+	purge|remove|upgrade)
+			rm -rf /usr/share/t3-gem-vnc/utils/websockify
+			rm -rf /home/gemstone/.vnc
+			rm -rf /home/gemstone/.config/t3-gem-vnc
+			deb-systemd-invoke stop "t3-gem-vnc.service" >/dev/null 2>&1 || true
+		;;
+
+	failed-upgrade|abort-install|abort-upgrade|disappear)
+		;;
+
+	*)
+		echo "failed \`$1'" >&2
+		exit 1
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,29 @@
+Source: t3-gem-vnc
+Section: web
+Priority: optional
+Maintainer: Gemstone Dev Team <dev@t3gemstone.org>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ debconf | debconf-2.0,
+Standards-Version: 4.6.2
+Homepage: https://github.com/novnc/noVNC
+
+Package: t3-gem-vnc
+Architecture: all
+Section: python
+Depends:
+ python3-numpy,
+ openssl,
+ systemd,
+ xxd,
+ tightvncserver,
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: VNC server/client binaries for Gemstone distribution
+ This package installs noVNC, TightVNC, helper scripts
+ and a systemd script. TightVNC is the VNC server and
+ this package also contains its configuration. You can change
+ VNC password with `tightvncpasswd ~/.vnc/passwd` command.
+ noVNC is used as a VNC proxy. It allows to access VNC desktop
+ over web browsers so a VNC client application is not needed.

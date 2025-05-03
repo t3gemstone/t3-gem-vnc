@@ -1,0 +1,15 @@
+Template: t3-gem-vnc/password
+Type: password
+Description: Enter new VNC password:
+ This password will be used for authentication
+ on the web page.
+
+Template: t3-gem-vnc/password-confirm
+Type: password
+Description: Confirm password:
+ Please confirm the password you entered.
+
+Template: t3-gem-vnc/password-mismatch
+Type: error
+Description: Password mismatch
+ The passwords you entered do not match. Please try again.

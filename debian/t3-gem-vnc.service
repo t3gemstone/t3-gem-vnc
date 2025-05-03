@@ -1,0 +1,13 @@
+[Unit]
+Description=Run VNC server and proxy as user
+After=network-online.target
+
+[Service]
+User=gemstone
+Group=gemstone
+WorkingDirectory=/home/gemstone
+ExecStart=/usr/share/t3-gem-vnc/run.sh start
+ExecStop=/usr/share/t3-gem-vnc/run.sh stop
+
+[Install]
+WantedBy=default.target

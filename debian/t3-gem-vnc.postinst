@@ -1,0 +1,103 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+NOVNC_CFG_DIR="/home/gemstone/.config/t3-gem-vnc"
+NOVNC_CERT_DIR="$NOVNC_CFG_DIR/self.pem"
+
+TIGHTVNC_DIR="/home/gemstone/.vnc"
+TIGHTVNC_PASSWD_DIR="$TIGHTVNC_DIR/passwd"
+TIGHTVNC_XSTARTUP_DIR="$TIGHTVNC_DIR/xstartup"
+
+UTILS_DIR="/usr/share/t3-gem-vnc/utils"
+ENABLE_SERVICES="false"
+
+create_vnc_passwd() {
+	if [ "$DEBIAN_FRONTEND" != "noninteractive" ]; then
+		db_get t3-gem-vnc/password
+		password="$RET"
+		printf '%s' "$password" | tightvncpasswd -f > "$TIGHTVNC_PASSWD_DIR"
+		db_reset t3-gem-vnc/password
+		db_reset t3-gem-vnc/password-confirm
+		db_stop
+		ENABLE_SERVICES="true"
+	else
+		return 0
+	fi
+
+	if [ -f "$TIGHTVNC_PASSWD_DIR" ]; then
+		chown gemstone:gemstone "$TIGHTVNC_PASSWD_DIR"
+		chmod 0600 "$TIGHTVNC_PASSWD_DIR"
+	fi
+
+	password=""
+}
+
+create_certificate() {
+	openssl req -new -days 365 -nodes -x509 \
+		-keyout "$NOVNC_CERT_DIR" \
+		-out "$NOVNC_CERT_DIR" \
+		-subj "/C=/ST=/L=City/O=/OU=/CN=" > /dev/null 2>&1
+
+	chown gemstone:gemstone "$NOVNC_CERT_DIR"
+}
+
+create_xstartup_file() {
+	cat << EOF > "$TIGHTVNC_XSTARTUP_DIR"
+#!/bin/sh
+
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+export DESKTOP_SESSION='t3-gemstone'
+export XDG_CONFIG_DIRS='/etc/xdg/xdg-t3-gemstone:/etc/xdg'
+
+/usr/bin/startxfce4
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+x-window-manager &
+EOF
+
+	chmod +x "$TIGHTVNC_XSTARTUP_DIR"
+}
+
+extract_websockify() {
+	tar -xzf $UTILS_DIR/websockify-*.tar.gz -C $UTILS_DIR
+	rm $UTILS_DIR/websockify-*.tar.gz
+	mv $UTILS_DIR/websockify-* $UTILS_DIR/websockify
+}
+
+case "$1" in
+	configure)
+		if [ ! -d "$TIGHTVNC_DIR" ]; then
+			mkdir "$TIGHTVNC_DIR"
+			chown gemstone:gemstone "$TIGHTVNC_DIR"
+		fi
+
+		if [ ! -d "$NOVNC_CFG_DIR" ]; then
+			mkdir "$NOVNC_CFG_DIR"
+			chown gemstone:gemstone "$NOVNC_CFG_DIR"
+		fi
+
+		create_vnc_passwd
+		create_xstartup_file
+		create_certificate
+		extract_websockify
+
+		if [ "$ENABLE_SERVICES" = "true" ]; then
+			echo "Enabling and starting t3-gem-vnc.service..." >&2
+			deb-systemd-helper enable "t3-gem-vnc.service" >/dev/null || true
+			deb-systemd-invoke start "t3-gem-vnc.service" >/dev/null || true
+
+			printf '\n\n'
+			echo "================================================="
+			echo "  Connect from https://<board-ip>:8443/vnc.html  "
+			echo "================================================="
+			printf '\n\n'
+		fi
+	;;
+esac
+
+#DEBHELPER#
