@@ -1,10 +1,6 @@
 name: Publish
 
-on:
-  push:
-  pull_request:
-  release:
-    types: [published]
+on: workflow_dispatch
 
 jobs:
   npm:
