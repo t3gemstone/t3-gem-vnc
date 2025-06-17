@@ -1,0 +1,21 @@
+on: push
+
+jobs:
+  build-debs:
+    name: Build DEB Files
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jtdor/build-deb-action@v1
+        with:
+          artifacts-dir: debian/artifacts-${{ matrix.os }}
+          buildpackage-opts: --build=binary --no-sign
+          docker-image: ubuntu:22.04
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.os }}
+          path: debian/artifacts-${{ matrix.os }}
+    
